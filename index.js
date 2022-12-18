@@ -13,8 +13,23 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
-        const database = client.db("insertDB").collection("haiku");
+        await client.connect();
+        const toolsCollection = client.db("tools_app_db").collection("tools");
 
+        // add an tool
+        app.post('/addItem', async (req, res) => {
+            const item = req.body;
+            const result = await toolsCollection.insertOne(item);
+            res.send(result);
+        })
+
+        // get all tools
+        app.get('/tools', async (req, res) => {
+            const query = {};
+            const cursor = toolsCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
 
     } finally {
         //   await client.close();
